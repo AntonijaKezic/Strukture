@@ -1,6 +1,4 @@
 #define _CRT_SECURE_NO_WARNINGS
-#define ERROR_OPENING_FILE 1
-#define ERROR_ALLOCATTING_MEMORY 2
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
