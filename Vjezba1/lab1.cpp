@@ -1,31 +1,78 @@
 #define _CRT_SECURE_NO_WARNINGS
-#define MAX 1024 
+#define ERROR_OPENING_FILE 1
+#define ERROR_ALLOCATTING_MEMORY 2
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define BUFFER_SIZE 1024
 
-int NumberOfRows(const char*); 
+
+int NumOffRows(char* filename);
+void get_row(char* filename, int row_count, struct Studenti* student);
+
+struct Studenti
+{
+	char ime[20];
+	char prezime[20];
+	int bodovi;
+
+};
 
 int main() {
-    int numOfRows = 0;
-    // Poziv funkcije koja broji redove u datoteci "imedat.txt"
-    numOfRows = NumberOfRows("imedat.txt");
-    return 0;
+	int n = 0;
+	int i = 0;
+	char* filename = "imena.txt";
+	n = NumOffRows(filename);
+	if (n <= 0) {
+		printf("No rows found or error in counting rows.\n");
+		return n;
+	}
+	struct Studenti* student = malloc(n * sizeof(struct Studenti));
+	if (student == NULL) {
+		printf("greska u alokaciji");
+		return ERROR_ALLOCATTING_MEMORY;
+
+	}
+	get_row(filename, n, student);
+
+
+	for (i = 0; i < n; i++) {
+		printf("%s\t%s\t%d\n", student[i].ime, student[i].prezime, student[i].bodovi);
+	}
+	return 0;
+
 }
+int NumOffRows(char* filename) {
+	FILE* fp = NULL;
+	char buffer[BUFFER_SIZE];
+	int row_counter = 0;
 
-int NumberOfRows(const char* fileName) {
-    FILE* fp = NULL;
-    int numOfRows = 0;
-    char buffer[MAX] = {}; // Prazan buffer za čitanje redaka
+	fp = fopen(filename, "r");
+	if (fp == NULL) {
+		printf("Error opening file\n");
+		return ERROR_OPENING_FILE;
+	}
+	while (!feof(fp)) {
+		fgets(buffer, BUFFER_SIZE, fp);
+		//sscanf() doma napravi mozda
+		++row_counter;
+	}
 
-    fp = fopen(fileName, "r");
-    if (!fp) {
-        // Ako se datoteka ne može otvoriti, vraća -1 kao oznaku greške
-        return -1;
-    }
-    while (!feof(fp)) {
-        fgets(buffer, MAX, fp);
-        numOfRows++;
-    }
-    fclose(fp);
-
-    return numOfRows; // Vraća broj redova u datoteci
+	fclose(fp);
+	return row_counter;
+}
+void get_row(char* filename, int row_count, struct Studenti* student) {
+	int i = 0;
+	FILE* fp = NULL;
+	fp = fopen(filename, "r");
+	if (fp == NULL) {
+		printf("error opening file\n");
+		return;
+	}
+	for (int i = 0; i < row_count; i++) {
+		fscanf(fp, "%s", student[i].ime);
+		fscanf(fp, "%s", student[i].prezime);
+		fscanf(fp, "%d", &student[i].bodovi);
+	}
+	fclose(fp);
 }
