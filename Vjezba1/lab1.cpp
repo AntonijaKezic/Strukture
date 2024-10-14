@@ -74,3 +74,116 @@ void get_row(char* filename, int row_count, struct Studenti* student) {
 	}
 	fclose(fp);
 }
+
+/*
+struct _person;
+typefed struct _person* position;
+typedef struct _person
+{
+	char name[MAX_SIZE];
+	char lastName[MAX_SIZE];
+	int birthYear;
+
+	position next;
+}Person;
+
+int main()
+{
+	Person head = {
+	.name = {0},
+	.lastName = {0},
+	.birthYear = {0},
+	.next = NULL
+	};
+
+	return 0;
+}
+
+int CreatePerson(char* name, char* lastName, int birthYear) {
+	Position newPerson = NULL;
+	newPerson = (Position)malloc(sizeof(Person));
+	if (newPerson == NULL) {
+		printf("Memorija nije alocirana\n");
+		return NULL;
+}
+	strcpy(newPerson->name, name);
+	strcpy(newPerson->lastName, lastName);
+	newPerson->birthYear = birthYear;
+	newPerson->next=NULL;
+		return newPerson;
+}
+
+int PrependList(Position head, char* name, char* lastName, int birtYear)
+	{
+		position newPerson = NULL;
+		newPerson = CreatePerson(name, lastName, birthYear);
+if (!newPerson)
+{
+	printf("Failed in person creation");
+	return -1;
+}
+last = FindLast(head);
+
+int InsertAfter(position prev, position newPerson) {
+	newPerson->next = prev->next;
+	prev->next = newPerson;
+	return EXIT_SUCCES;
+}
+
+newPerson->next = head->next;
+head->next = newPerson;
+return EXIT_SUCCES;
+}
+	
+int PrintList(position first)
+{
+	position temp = NULL;
+	temp = first;
+	while (temp != NULL)
+	{
+		printf("%s %s %d", temp->name, temp->lastName, temp->birthYear);
+		temp = temp->next;
+	}
+	return EXIT_SUCCES;	return EXIT_SUCCES;
+}
+
+int AppendList(Position head, char* name, char* lastName, int birtYear) {
+	position newPerson = NULL;
+	position last = NULL;
+
+	newPerson=CreatePerson(name, lastName, birthYear)
+}
+
+position FindLast(position head) {
+	position last = NULL;
+	last = head;
+	while (last->next != NULL) {
+		last = last->next;
+	}
+	return last;
+}
+
+position  FindByLastName(position first, char* lastName, int birtYear) {
+	position temp = NULL;
+	temp = first;
+	while (temp) {
+		if (strcmp(lastName, temp->lastName) == 0{
+			return temp;
+		}
+		temp=temp->next;
+	}
+	return NULL;
+}
+
+int Delete(position head, char* name) {
+	position prev = NULL;
+		position toDelete = NULL;
+
+		prev = FindPrev(head, name);
+	toDelete = prev->next;
+	prev->next = toDelete->next;
+	free(toDelete);
+	return EXIT_SUCCES;
+}
+
+*/
