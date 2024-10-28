@@ -76,114 +76,171 @@ void get_row(char* filename, int row_count, struct Studenti* student) {
 }
 
 /*
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX_SIZE 50
+
 struct _person;
-typefed struct _person* position;
+typedef struct _person* position;
 typedef struct _person
 {
 	char name[MAX_SIZE];
 	char lastName[MAX_SIZE];
-	int birthYear;
+	int birthyear;
 
 	position next;
 }Person;
 
-int main()
-{
-	Person head = {
-	.name = {0},
-	.lastName = {0},
-	.birthYear = {0},
-	.next = NULL
-	};
-
-	return 0;
-}
-
-int CreatePerson(char* name, char* lastName, int birthYear) {
-	Position newPerson = NULL;
-	newPerson = (Position)malloc(sizeof(Person));
-	if (newPerson == NULL) {
-		printf("Memorija nije alocirana\n");
+position CreatePerson(char* name, char* lastName, int by) {
+	position newPerson = NULL;
+	newPerson = (position)malloc(sizeof(Person));
+	if (!newPerson) {
+		printf("Bad allocation!\n");
 		return NULL;
-}
+	}
 	strcpy(newPerson->name, name);
 	strcpy(newPerson->lastName, lastName);
-	newPerson->birthYear = birthYear;
-	newPerson->next=NULL;
-		return newPerson;
+	newPerson->birthyear = by;
+	newPerson->next = NULL;
+
+	return newPerson;
+
 }
 
-int PrependList(Position head, char* name, char* lastName, int birtYear)
-	{
-		position newPerson = NULL;
-		newPerson = CreatePerson(name, lastName, birthYear);
-if (!newPerson)
-{
-	printf("Failed in person creation");
-	return -1;
-}
-last = FindLast(head);
+int PrependList(position head, char* name, char* lastName, int by) {
+	position newPerson = NULL;
+	newPerson = CreatePerson(name, lastName, by);
+	if (!newPerson) {
+		printf("Failed in person creation!\n");
+		return NULL;
+	}
 
-int InsertAfter(position prev, position newPerson) {
-	newPerson->next = prev->next;
-	prev->next = newPerson;
-	return EXIT_SUCCES;
-}
+	newPerson->next = head->next;
+	head->next = newPerson;
 
-newPerson->next = head->next;
-head->next = newPerson;
-return EXIT_SUCCES;
+	return EXIT_SUCCESS;
+
 }
-	
-int PrintList(position first)
+int printList(position first)
 {
 	position temp = NULL;
 	temp = first;
+
 	while (temp != NULL)
 	{
-		printf("%s %s %d", temp->name, temp->lastName, temp->birthYear);
+		printf("%s %s %d", temp->name, temp->lastName, temp->birthyear);
 		temp = temp->next;
+
 	}
-	return EXIT_SUCCES;	return EXIT_SUCCES;
+	return EXIT_SUCCESS;
+
 }
 
-int AppendList(Position head, char* name, char* lastName, int birtYear) {
+int AppendList(position head, char* name, char* lastName, int by)
+{
 	position newPerson = NULL;
+	newPerson = CreatePerson(name, lastName, by);
 	position last = NULL;
+	if (!newPerson) {
+		printf("Failed in person creation!\n");
+		return NULL;
+	}
 
-	newPerson=CreatePerson(name, lastName, birthYear)
+	last = FindLast(head);
+	newPerson->next = last->next;
+	last->next = newPerson;
+	return EXIT_SUCCESS;
 }
 
-position FindLast(position head) {
+position FindLast(position head)
+{
 	position last = NULL;
 	last = head;
-	while (last->next != NULL) {
+
+	while (last->next != NULL)
+	{
 		last = last->next;
 	}
 	return last;
 }
 
-position  FindByLastName(position first, char* lastName, int birtYear) {
+position FindByLastName(position first, char* name, char* lastName, int by)
+{
 	position temp = NULL;
 	temp = first;
-	while (temp) {
-		if (strcmp(lastName, temp->lastName) == 0{
+	while (temp)
+	{
+		if (strcmp(lastName, temp->lastName) == 0)
+		{
 			return temp;
 		}
-		temp=temp->next;
+		temp = temp->next;
 	}
 	return NULL;
 }
-
-int Delete(position head, char* name) {
+int Delete(position head, position name) {
 	position prev = NULL;
-		position toDelete = NULL;
+	position toDelete;
+	prev = FindPrev(head, name);
 
-		prev = FindPrev(head, name);
-	toDelete = prev->next;
-	prev->next = toDelete->next;
-	free(toDelete);
-	return EXIT_SUCCES;
+	if (prev != NULL) {
+		toDelete = prev->next;
+		prev->next = prev->next->next;
+		free(toDelete);
+	}
+	return 0;
+
 }
+
+position FindPrev(position head, position wanted) {
+	position temp = head;
+
+	while (temp->next != NULL) {
+		if (temp->next == wanted) {
+			return temp;
+		}
+		temp = temp->next;
+	}
+
+	return NULL;
+}
+
+
+
+
+
+
+int main()
+{
+	Person head = {
+		.name = "",
+		.lastName = "",
+		.birthyear = 0,
+		.next = NULL
+	};
+	/*
+	// Testiranje funkcija
+	PrependList(&head, "Ana", "Kovac", 1990);
+	AppendList(&head, "Jana", "Peric", 1985);
+	AppendList(&head, "Pero", "Horvat", 2000);
+
+	printf("Lista:\n");
+	printList(&head);
+
+	// Brisanje osobe
+	position toDelete = FindByLastName(&head, "Peric");
+	if (toDelete) {
+		Delete(&head, toDelete);
+	}
+
+	printf("\nNova lista:\n");
+	printList(&head);
+	*/
+	return 0;
+
+}
+
 
 */
