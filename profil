@@ -1,0 +1,123 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct _person;
+typedef struct _person* position;
+
+typedef struct _person {
+    char ime[50];
+    char prezime[50];
+    char spol[10];
+    char datumIspitivanja[11];
+    char datumRodenja[11];
+    char materinjiJezik[30];
+    char ispitivac[50];
+    char napomene[200];
+    position next;
+} Person;
+
+// Funkcija za kreiranje novog korisnika
+position CreatePerson(
+    char* name, char* lastName, char* spol,
+    char* datumIspitivanja, char* datumRodjenja,
+    char* materinjiJezik, char* ispitivac, char* napomene
+) {
+    position newPerson = (position)malloc(sizeof(Person));
+    if (!newPerson) {
+        printf("Greska pri alokaciji memorije!\n");
+        return NULL;
+    }
+
+    strcpy(newPerson->ime, name);
+    strcpy(newPerson->prezime, lastName);
+    strcpy(newPerson->spol, spol);
+    strcpy(newPerson->datumIspitivanja, datumIspitivanja);
+    strcpy(newPerson->datumRodenja, datumRodjenja);
+    strcpy(newPerson->materinjiJezik, materinjiJezik);
+    strcpy(newPerson->ispitivac, ispitivac);
+    strcpy(newPerson->napomene, napomene);
+    newPerson->next = NULL;
+
+    return newPerson;
+}
+
+// Funkcija za spremanje profila u datoteku
+void SaveProfileToFile(position person, const char* fileName) {
+    FILE* file = fopen(fileName, "w");
+    if (!file) {
+        printf("Greska pri otvaranju datoteke!\n");
+        return;
+    }
+
+    fprintf(file, "Ime: %s\n", person->ime);
+    fprintf(file, "Prezime: %s\n", person->prezime);
+    fprintf(file, "Spol: %s\n", person->spol);
+    fprintf(file, "Datum ispitivanja: %s\n", person->datumIspitivanja);
+    fprintf(file, "Datum rodenja: %s\n", person->datumRodenja);
+    fprintf(file, "Materinji jezik: %s\n", person->materinjiJezik);
+    fprintf(file, "Ispitivac: %s\n", person->ispitivac);
+    fprintf(file, "Napomene: %s\n", person->napomene);
+
+    fclose(file);
+    printf("Profil uspjesno spremljen u datoteku: %s\n", fileName);
+}
+
+// Funkcija za unos podataka od korisnika
+void ClearBuffer() {
+    while (getchar() != '\n');
+}
+
+position InputProfile() {
+    char ime[50], prezime[50], spol[10];
+    char datumIspitivanja[11], datumRodenja[11];
+    char materinjiJezik[30], ispitivac[50], napomene[200];
+
+    printf("Unesite ime: ");
+    scanf(" %49[^\n]", ime);
+    ClearBuffer();
+
+    printf("Unesite prezime: ");
+    scanf(" %49[^\n]", prezime);
+    ClearBuffer();
+
+    printf("Unesite spol (M/Z): ");
+    scanf(" %9[^\n]", spol);
+    ClearBuffer();
+
+    printf("Unesite datum ispitivanja (DD.MM.GGGG): ");
+    scanf(" %10[^\n]", datumIspitivanja);
+    ClearBuffer();
+
+    printf("Unesite datum rodenja (DD.MM.GGGG): ");
+    scanf(" %10[^\n]", datumRodenja);
+    ClearBuffer();
+
+    printf("Unesite materinji jezik: ");
+    scanf(" %29[^\n]", materinjiJezik);
+    ClearBuffer();
+
+    printf("Unesite ime ispitivaca: ");
+    scanf(" %49[^\n]", ispitivac);
+    ClearBuffer();
+
+    printf("Unesite napomene: ");
+    scanf(" %199[^\n]", napomene);
+    ClearBuffer();
+
+    return CreatePerson(ime, prezime, spol, datumIspitivanja, datumRodenja, materinjiJezik, ispitivac, napomene);
+}
+
+// Glavni program
+int main() {
+    printf("Kreiranje novog profila korisnika:\n");
+    position newPerson = InputProfile();
+
+    if (newPerson) {
+        SaveProfileToFile(newPerson, "profil_korisnika.txt");
+        free(newPerson);
+    }
+
+    return 0;
+}
