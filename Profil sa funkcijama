@@ -1,0 +1,350 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct _person;
+typedef struct _person* position;
+
+typedef struct _person {
+    char ime[50];
+    char prezime[50];
+    char spol[10];
+    char datumIspitivanja[11];
+    char datumRodenja[11];
+    char materinjiJezik[30];
+    char ispitivac[50];
+    char napomene[200];
+    position next;
+} Person;
+
+position CreatePerson(
+    char* name, char* lastName, char* spol,
+    char* datumIspitivanja, char* datumRodjenja,
+    char* materinjiJezik, char* ispitivac, char* napomene
+) {
+    position newPerson = (position)malloc(sizeof(Person));
+    if (!newPerson) {
+        printf("Greska pri alokaciji memorije!\n");
+        return NULL;
+    }
+
+    strcpy(newPerson->ime, name);
+    strcpy(newPerson->prezime, lastName);
+    strcpy(newPerson->spol, spol);
+    strcpy(newPerson->datumIspitivanja, datumIspitivanja);
+    strcpy(newPerson->datumRodenja, datumRodjenja);
+    strcpy(newPerson->materinjiJezik, materinjiJezik);
+    strcpy(newPerson->ispitivac, ispitivac);
+    strcpy(newPerson->napomene, napomene);
+    newPerson->next = NULL;
+
+    return newPerson;
+}
+
+// Funkcija za spremanje profila u datoteku
+void SaveProfileToFile(position person, const char* fileName) {
+    FILE* file = fopen(fileName, "w");
+    if (!file) {
+        printf("Greska pri otvaranju datoteke!\n");
+        return;
+    }
+
+    fprintf(file, "Ime: %s\n", person->ime);
+    fprintf(file, "Prezime: %s\n", person->prezime);
+    fprintf(file, "Spol: %s\n", person->spol);
+    fprintf(file, "Datum ispitivanja: %s\n", person->datumIspitivanja);
+    fprintf(file, "Datum rodenja: %s\n", person->datumRodenja);
+    fprintf(file, "Materinji jezik: %s\n", person->materinjiJezik);
+    fprintf(file, "Ispitivac: %s\n", person->ispitivac);
+    fprintf(file, "Napomene: %s\n", person->napomene);
+
+    fclose(file);
+    printf("Profil uspjesno spremljen u datoteku: %s\n", fileName);
+}
+
+// Funkcija za unos podataka od korisnika
+void ClearBuffer() {
+    while (getchar() != '\n');
+}
+
+position InputProfile() {
+    char ime[50], prezime[50], spol[10];
+    char datumIspitivanja[11], datumRodenja[11];
+    char materinjiJezik[30], ispitivac[50], napomene[200];
+
+    printf("Unesite ime: ");
+    scanf(" %49[^\n]", ime);
+    ClearBuffer();
+
+    printf("Unesite prezime: ");
+    scanf(" %49[^\n]", prezime);
+    ClearBuffer();
+
+    printf("Unesite spol (M/Z): ");
+    scanf(" %9[^\n]", spol);
+    ClearBuffer();
+
+    printf("Unesite datum ispitivanja (DD.MM.GGGG): ");
+    scanf(" %10[^\n]", datumIspitivanja);
+    ClearBuffer();
+
+    printf("Unesite datum rodenja (DD.MM.GGGG): ");
+    scanf(" %10[^\n]", datumRodenja);
+    ClearBuffer();
+
+    printf("Unesite materinji jezik: ");
+    scanf(" %29[^\n]", materinjiJezik);
+    ClearBuffer();
+
+    printf("Unesite ime ispitivaca: ");
+    scanf(" %49[^\n]", ispitivac);
+    ClearBuffer();
+
+    printf("Unesite napomene: ");
+    scanf(" %199[^\n]", napomene);
+    ClearBuffer();
+
+    return CreatePerson(ime, prezime, spol, datumIspitivanja, datumRodenja, materinjiJezik, ispitivac, napomene);
+}
+
+// Funkcija za zapisivanje zadataka za prepoznavanje rime
+void prepoznavanje_zapis(const char* fileName) {
+    FILE* file = fopen(fileName, "w");
+    if (!file) {
+        printf("Greska pri otvaranju datoteke: %s\n", fileName);
+        return;
+    }
+
+    fprintf(file, "soba - roba\n");
+    fprintf(file, "grana - brana\n");
+    fprintf(file, "suma - vina\n");
+    fprintf(file, "crkva - mrkva\n");
+    fprintf(file, "padobran - knjizara\n");
+    fprintf(file, "gljiva - sljiva\n");
+    fprintf(file, "vodopad - sudoper\n");
+
+    fclose(file);
+    printf("Zadatci za prepoznavanje rime uspjesno zapisani u datoteku: %s\n", fileName);
+}
+
+
+// Funkcija za zapisivanje zadataka za proizvodnju rime
+void proizvodnja_zapis(const char* fileName) {
+    FILE* file = fopen(fileName, "w");
+    if (!file) {
+        printf("Greska pri otvaranju datoteke: %s\n", fileName);
+        return;
+    }
+
+    fprintf(file, "most\n");
+    fprintf(file, "meta\n");
+    fprintf(file, "puska\n");
+    fprintf(file, "crv\n");
+    fprintf(file, "lonac\n");
+    fprintf(file, "trava\n");
+    fprintf(file, "guma\n");
+
+    fclose(file);
+    printf("Zadatci za proizvodnju rime uspjesno zapisani u datoteku: %s\n", fileName);
+}
+
+
+// Funkcija za prepoznavanje rime
+int prepoznavanje_rime(const char* fileName) {
+    FILE* file = fopen(fileName, "r");
+    if (!file) {
+        printf("Greska pri otvaranju datoteke!\n");
+        return 0;
+    }
+
+    char line[100];
+    int score = 0;
+    while (fgets(line, sizeof(line), file)) {
+        printf("Rimuju li se rijeci? %s (DA/NE): ", line);
+        char response[10];
+        scanf(" %9s", response);
+
+        if (strcmp(response, "DA") == 0) {
+            score++;
+        }
+    }
+
+    fclose(file);
+    printf("Bodovi za prepoznavanje rime: %d\n", score);
+
+    if (score < 3) {
+        printf("\nPrepoznavanje rime nije dovoljno uspjesno, a samim time nije moguca ni pozeljna proizvodnja.\n");
+        printf("Preporuka je vjezbanje prepoznavanja. Pokusajte ponovo rijesiti zadatak.\n\n");
+        prepoznavanje_rime("zadavanje_rime.txt");
+    }
+
+    return score;    
+}
+
+// Funkcija za proizvodnju rime
+int proizvodnja_rime(const char* fileName) {
+    FILE* file = fopen(fileName, "r");
+    if (!file) {
+        printf("Greska pri otvaranju datoteke!\n");
+        return 0;
+    }
+
+    char line[100];
+    int bod = 0;
+    while (fgets(line, sizeof(line), file)) {
+        line[strcspn(line, "\n")] = 0; // Uklanjanje \n iz linije
+        printf("Unesite rijec koja se rimuje s '%s': ", line);
+        char userWord[100];
+        scanf(" %99s", userWord);
+
+        // Provjera zadnjeg sloga
+        int len1 = strlen(line);
+        int len2 = strlen(userWord);
+        if (len1 >= 2 && len2 >= 2 && strcmp(&line[len1 - 2], &userWord[len2 - 2]) == 0) {
+            bod++;
+        }
+    }
+
+    fclose(file);
+
+    printf("Bodovi za proizvodnju rime: %d\n", bod);
+
+
+    if (bod > 5) {
+        printf("Proizvodnja rime uspjesna!\n");
+    }else {
+        printf("Usvojenost rime nije dovoljno uspjesna. Nakon vjezbe testirajte ponovo usvojenost rime.\n");
+        prepoznavanje_rime("zadavanje_rime.txt");
+    }
+
+    return bod;
+}
+
+
+void s_rasclamba(const char* fileName) {
+    FILE* file = fopen(fileName, "w");
+    if (!file) {
+        printf("Greska pri otvaranju datoteke: %s\n", fileName);
+        return;
+    }
+
+    fprintf(file, "1 kugla\n");
+    fprintf(file, "2 sedam\n");
+    fprintf(file, "3 pravac\n");
+    fprintf(file, "4 tramvaj\n");
+    fprintf(file, "5 kutija\n");
+    fprintf(file, "6 suncokret\n");
+    fprintf(file, "7 vješalica\n");
+
+    fclose(file);
+    printf("Zadatci za slogovnu rašclambu uspješno zapisani u datoteku: %s\n", fileName);
+}
+
+void s_stapanje(const char* fileName) {
+    FILE* file = fopen(fileName, "w");
+    if (!file) {
+        printf("Greska pri otvaranju datoteke: %s\n", fileName);
+        return;
+    }
+
+    fprintf(file, "1 va-za\n");
+    fprintf(file, "2 ka-men\n");
+    fprintf(file, "3 pro-zor\n");
+    fprintf(file, "4 vo-ćka\n");
+    fprintf(file, "5 lo-pa-ta\n");
+    fprintf(file, "6 vi-li-ca\n");
+    fprintf(file, "7 he-li-ko-pter\n");
+
+    fclose(file);
+    printf("Zadatci za slogovno stapanje uspješno zapisani u datoteku: %s\n", fileName);
+}
+
+void f_rasclamba(const char* fileName) {
+    FILE* file = fopen(fileName, "w");
+    if (!file) {
+        printf("Greska pri otvaranju datoteke: %s\n", fileName);
+        return;
+    }
+
+    fprintf(file, "1 vuk\n");
+    fprintf(file, "2 njuh\n");
+    fprintf(file, "3 usna\n");
+    fprintf(file, "4 hrana\n");
+    fprintf(file, "5 mačak\n");
+    fprintf(file, "6 maškare\n");
+    fprintf(file, "7 mrvica\n");
+
+    fclose(file);
+    printf("Zadatak fonemske raščlambe uspjesno zapisani u datoteku: %s\n", fileName);
+}
+
+void f_stapanje(const char* fileName) {
+    FILE* file = fopen(fileName, "w");
+    if (!file) {
+        printf("Greska pri otvaranju datoteke: %s\n", fileName);
+        return;
+    }
+
+    fprintf(file, "1 z-e-k-o\n");
+    fprintf(file, "2 k-o-l-a-č\n");
+    fprintf(file, "3 k-nj-i-g-a\n");
+    fprintf(file, "4 b-o-j-i-c-a\n");
+    fprintf(file, "5 z-a-v-j-e-s-a\n");
+    fprintf(file, "6 m-a-s-l-a-č-a-k\n");
+    fprintf(file, "7 v-j-e-v-e-r-i-c-a\n");
+
+    fclose(file);
+    printf("Zadatak fonemskog stapanja uspjesno zapisani u datoteku: %s\n", fileName);
+}
+
+
+
+// Glavni program
+int main() {
+    prepoznavanje_zapis("zadavanje_rime.txt");
+    proizvodnja_zapis("proizvodnja_rime.txt");
+
+    s_rasclamba("slogovna_rasclamba.txt");
+    s_stapanje("slogovno_stapanje.txt");
+    
+    f_rasclamba("fonemska_rasclamba.txt");
+    f_stapanje("fonemsko_stapanje.txt");
+
+    while (1) {
+        printf("\nProces testiranja:\n");
+        printf("1. Kreiranje profila\n");
+        printf("2. Prepoznavanje rime\n");
+        printf("3. Proizvodnja rime\n");
+
+        position newPerson = InputProfile(); // Unos profila
+        if (newPerson) {
+            SaveProfileToFile(newPerson, "profil_korisnika.txt");
+            free(newPerson);
+        }
+
+        printf("\nZadatak: Prepoznavanje rime\n");
+        int score = prepoznavanje_rime("zadavanje_rime.txt");
+
+        printf("Mozete testirati proizvodnju rime : \n");
+        printf("\nZadatak: Proizvodnja rime\n");
+        int bod = proizvodnja_rime("proizvodnja_rime.txt");
+
+        int bodovi = score + bod;
+        if (bodovi > 8) {
+            printf("Usvojenost rime uspjesna!\n");
+        }
+        else {
+            printf("Usvojenost rime nije dovoljno uspjesna. Nakon vjezbe testirajte ponovo usvojenost rime.\n");
+            prepoznavanje_rime("zadavanje_rime.txt");
+        }
+        
+    }
+
+    return 0;
+}
+
+
+
+
+   
