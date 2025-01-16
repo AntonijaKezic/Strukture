@@ -1,0 +1,466 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct _person;
+typedef struct _person* position;
+
+typedef struct _person {
+    char ime[50];
+    char prezime[50];
+    char spol[10];
+    char datumIspitivanja[11];
+    char datumRodenja[11];
+    char materinjiJezik[30];
+    char ispitivac[50];
+    char napomene[200];
+    position next;
+} Person;
+
+position CreatePerson(
+    char* name, char* lastName, char* spol,
+    char* datumIspitivanja, char* datumRodjenja,
+    char* materinjiJezik, char* ispitivac, char* napomene
+) {
+    position newPerson = (position)malloc(sizeof(Person));
+    if (!newPerson) {
+        printf("Greska pri alokaciji memorije!\n");
+        return NULL;
+    }
+
+    strcpy(newPerson->ime, name);
+    strcpy(newPerson->prezime, lastName);
+    strcpy(newPerson->spol, spol);
+    strcpy(newPerson->datumIspitivanja, datumIspitivanja);
+    strcpy(newPerson->datumRodenja, datumRodjenja);
+    strcpy(newPerson->materinjiJezik, materinjiJezik);
+    strcpy(newPerson->ispitivac, ispitivac);
+    strcpy(newPerson->napomene, napomene);
+    newPerson->next = NULL;
+
+    return newPerson;
+}
+
+
+position InputProfile() {
+    char ime[50], prezime[50], spol[10];
+    char datumIspitivanja[11], datumRodenja[11];
+    char materinjiJezik[30], ispitivac[50], napomene[200];
+
+    printf("Unesite ime: ");
+    fgets(ime, sizeof(ime), stdin);
+    ime[strcspn(ime, "\n")] = 0;  
+
+    printf("Unesite prezime: ");
+    fgets(prezime, sizeof(prezime), stdin);
+    prezime[strcspn(prezime, "\n")] = 0;
+
+    printf("Unesite spol (M/Z): ");
+    fgets(spol, sizeof(spol), stdin);
+    spol[strcspn(spol, "\n")] = '\0';  
+
+
+    printf("Unesite datum ispitivanja (DD.MM.GGGG): ");
+    fgets(datumIspitivanja, sizeof(datumIspitivanja), stdin);
+    datumIspitivanja[strcspn(datumIspitivanja, "\n")] = '\0';
+
+
+    printf("Unesite datum rodenja (DD.MM.GGGG): ");
+    fgets(datumRodenja, sizeof(datumRodenja), stdin);
+    datumRodenja[strcspn(datumRodenja, "\n")] = '\0';
+
+    printf("Unesite materinji jezik: ");
+    fgets(materinjiJezik, sizeof(materinjiJezik), stdin);
+    materinjiJezik[strcspn(materinjiJezik, "\n")] = 0;
+
+    printf("Unesite ime ispitivaca: ");
+    fgets(ispitivac, sizeof(ispitivac), stdin);
+    ispitivac[strcspn(ispitivac, "\n")] = 0;
+
+    printf("Unesite napomene: ");
+    fgets(napomene, sizeof(napomene), stdin);
+    napomene[strcspn(napomene, "\n")] = 0;
+
+    return CreatePerson(ime, prezime, spol, datumIspitivanja, datumRodenja, materinjiJezik, ispitivac, napomene);
+}
+
+// Funkcija za spremanje profila u datoteku
+void SaveProfileToFile(position person, const char* fileName) {
+    FILE* file = fopen(fileName, "a");
+    if (!file) {
+        printf("Greska pri otvaranju datoteke!\n");
+        return;
+    }
+
+    fprintf(file, "\nPodaci o ispitaniku:\n");
+
+    fprintf(file, "\nIme: %s\n", person->ime);
+    fprintf(file, "Prezime: %s\n", person->prezime);
+    fprintf(file, "Spol: %s\n", person->spol);
+    fprintf(file, "Datum ispitivanja: %s\n", person->datumIspitivanja);
+    fprintf(file, "Datum rodenja: %s\n", person->datumRodenja);
+    fprintf(file, "Materinji jezik: %s\n", person->materinjiJezik);
+    fprintf(file, "Ispitivac: %s\n", person->ispitivac);
+    fprintf(file, "Napomene: %s\n", person->napomene);
+
+    fclose(file);
+    printf("Profil uspjesno spremljen u datoteku: %s\n", fileName);
+}
+
+// Definicija strukture za korisnički profil
+typedef struct {
+    char ime[100];
+    char prezime[100];
+    int bodovi;
+} UserProfile;
+
+// Definicija čvora u binarnom stablu
+typedef struct TreeNode {
+    UserProfile data;
+    struct TreeNode* left;
+    struct TreeNode* right;
+} TreeNode;
+
+// Funkcija za stvaranje novog čvora
+TreeNode* createNode(UserProfile data) {
+    TreeNode* newNode = malloc(sizeof(TreeNode));
+    if (newNode == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);  // Izađite iz programa ako malloc ne uspije
+    }
+    newNode->data = data;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+// Funkcija za umetanje čvora u binarno stablo
+TreeNode* insertNode(TreeNode* root, UserProfile data) {
+    if (root == NULL) {
+        return createNode(data);  
+    }
+
+    // Ako su bodovi manji, lijevo
+    if (data.bodovi < root->data.bodovi) {
+        root->left = insertNode(root->left, data);
+    }
+    // Ako su bodovi veći, desno
+    else if (data.bodovi > root->data.bodovi) {
+        root->right = insertNode(root->right, data);
+    }
+    // Ako su bodovi isti, umetanje u lijevo podstablo
+    else {
+        root->left = insertNode(root->left, data);
+    }
+
+    return root;
+}
+
+// Funkcija za čitanje podataka iz datoteke i izgradnju stabla
+void readFileAndBuildTree(const char* filename, TreeNode** root) {
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Greška pri otvaranju datoteke.\n");
+        return;  
+    }
+
+    UserProfile profile;  // Struktura za pohranu podataka o profilu
+    char temp[200];  // Privremena varijabla za čitanje svake linije iz datoteke
+
+    // Čitanje podataka
+    while (fgets(temp, sizeof(temp), file)) {
+        // Provjeravamo je li trenutna linija ime
+        if (strncmp(temp, "Ime:", 4) == 0) {
+            sscanf(temp, "Ime: %s", profile.ime);  // Spremamo ime korisnika
+        }
+
+        // Provjeravamo je li trenutna linija prezime
+        if (strncmp(temp, "Prezime:", 8) == 0) {
+            sscanf(temp, "Prezime: %s", profile.prezime);  // Spremamo prezime korisnika
+        }
+
+        // Provjeravamo je li trenutna linija uspjeh u bodovima
+        if (strncmp(temp, "Uspjeh u bodovima:", 18) == 0) {
+            sscanf(temp, "Uspjeh u bodovima: %d", &profile.bodovi);  // Spremamo bodove korisnika
+
+            // Umetnemo profil u stablo pomoću funkcije insertNode
+            *root = insertNode(*root, profile);
+        }
+    }
+    fclose(file);
+}
+
+
+// Funkcija za ispisivanje stabla (sortirano) u datoteku
+void sortiranje(TreeNode* root, FILE* file) {
+    if (root != NULL) {
+        sortiranje(root->left, file);
+        fprintf(file, "\nIme i prezime: %s %s\nBodovi: %d\n", root->data.ime, root->data.prezime, root->data.bodovi);
+        sortiranje(root->right, file);
+    }
+}
+
+
+// Funkcija za zapisivanje zadataka za prepoznavanje rime i proizvodnju rime u istu datoteku
+void rima_zadaci(const char* fileName) {
+    FILE* file = fopen(fileName, "w");
+    if (!file) {
+        printf("Greska pri otvaranju datoteke: %s\n", fileName);
+        return;
+    }
+
+    // Zadatci za prepoznavanje rime
+    fprintf(file, "Prepoznavanje rime:\n\n");
+    fprintf(file, "1 soba - roba\n");
+    fprintf(file, "2 grana - brana\n");
+    fprintf(file, "3 suma - vina\n");
+    fprintf(file, "4 crkva - mrkva\n");
+    fprintf(file, "5 padobran - knjizara\n");
+    fprintf(file, "6 gljiva - sljiva\n");
+    fprintf(file, "7 vodopad - sudoper\n");
+
+    fprintf(file, "\nProizvodnja rime:\n\n");
+    fprintf(file, "1 most\n");
+    fprintf(file, "2 meta\n");
+    fprintf(file, "3 puska\n");
+    fprintf(file, "4 crv\n");
+    fprintf(file, "5 lonac\n");
+    fprintf(file, "6 trava\n");
+    fprintf(file, "7 guma\n");
+
+    fclose(file);
+}
+
+// Funkcija za zapisivanje zadataka za slogovnu svjesnost u datoteku
+void slogovni_zadaci(const char* fileName) {
+    FILE* file = fopen(fileName, "w");
+    if (!file) {
+        printf("Greska pri otvaranju datoteke: %s\n", fileName);
+        return;
+    }
+
+    fprintf(file, "\nSlogovna rasclamba:\n\n");
+    char* zadaci1[] = { "kugla", "sedam", "pravac", "tramvaj", "kutija", "suncokret", "vješalica" };
+    for (int i = 0; i < 7; i++) {
+        fprintf(file, "%d %s\n", i + 1, zadaci1[i]);
+    }
+    fprintf(file, "\nSlogovno stapanje:\n\n");
+    char* zadaci2[] = { "va-za", "ka-men", "pro-zor", "vo-ćka", "lo-pa-ta", "vi-li-ca", "he-li-ko-pter" };
+    for (int i = 0; i < 7; i++) {
+        fprintf(file, "%d %s\n", i + 1, zadaci2[i]);
+    }
+
+    fclose(file);
+}
+
+// Funkcija za zapisivanje zadataka za fonemsku svjesnost u datoteku
+void fonemski_zadaci(const char* fileName) {
+    FILE* file = fopen(fileName, "w");
+    if (!file) {
+        printf("Greska pri otvaranju datoteke: %s\n", fileName);
+        return;
+    }
+
+    // Zadatci za fonemsku rašclambu
+    fprintf(file, "Fonemska rašclamba:\n\n");
+    fprintf(file, "1 vuk\n");
+    fprintf(file, "2 njuh\n");
+    fprintf(file, "3 usna\n");
+    fprintf(file, "4 hrana\n");
+    fprintf(file, "5 mačak\n");
+    fprintf(file, "6 maškare\n");
+    fprintf(file, "7 mrvica\n");
+
+    // Zadatci za fonemsko stapanje
+    fprintf(file, "\nFonemsko stapanje:\n\n");
+    fprintf(file, "1 z-e-k-o\n");
+    fprintf(file, "2 k-o-l-a-č\n");
+    fprintf(file, "3 k-nj-i-g-a\n");
+    fprintf(file, "4 b-o-j-i-c-a\n");
+    fprintf(file, "5 z-a-v-j-e-s-a\n");
+    fprintf(file, "6 m-a-s-l-a-č-a-k\n");
+    fprintf(file, "7 v-j-e-v-e-r-i-c-a\n");
+
+    fclose(file);
+}
+
+int unos_bodova() {
+    int bodovi = 0;
+    char unos[50];
+
+    printf("Unesite bodove (npr. 1+1+2...) i pritisnite Enter:\n");
+    fgets(unos, sizeof(unos), stdin);
+
+    int trenutni_broj = 0;
+    for (int i = 0; unos[i] != '\0'; i++) {
+        if (unos[i] >= '0' && unos[i] <= '9') {  // Ako je broj
+            trenutni_broj = trenutni_broj * 10 + (unos[i] - '0');
+        }
+        else if (unos[i] == '+') {  // Ako naiđemo na '+', dodajemo broj u bodove
+            bodovi += trenutni_broj;
+            trenutni_broj = 0;
+        }
+    }
+    bodovi += trenutni_broj;  // Dodavanje zadnjeg broja
+    printf("\nOstvaren broj bodova na ovom zadatku je: %d\n", bodovi);
+    return bodovi;
+}
+
+void rima_test(const char* fileName) {
+    FILE* file = fopen(fileName, "r");
+    if (!file) {
+        printf("Greška pri otvaranju datoteke: %s\n", fileName);
+        return;
+    }
+
+    char line[100];
+
+    // Čitanje i ispisivanje sadržaja datoteke
+    while (fgets(line, sizeof(line), file)) {
+        printf("%s", line); 
+    }
+
+    fclose(file);
+}
+
+void slogovi_test(const char* fileName) {
+    FILE* file = fopen(fileName, "r");
+    if (!file) {
+        printf("Greška pri otvaranju datoteke: %s\n", fileName);
+        return;
+    }
+
+    char line[100];
+
+    // Čitanje zadataka iz datoteke i ispis
+    while (fgets(line, sizeof(line), file)) {
+        printf("%s", line);
+    }
+
+    fclose(file);
+}
+
+void fonemi_test(const char* fileName) {
+    FILE* file = fopen(fileName, "r");
+    if (!file) {
+        printf("Greška pri otvaranju datoteke: %s\n", fileName);
+        return;
+    }
+
+    char line[100];
+
+    // Čitanje i ispisivanje svih zadataka iz datoteke
+    while (fgets(line, sizeof(line), file)) {
+        printf("%s", line);  
+    }
+
+    fclose(file);
+}
+
+//u popis_ispitanika.txt nalaze se samo imena, prezimena i bodovi ispitanika u svrhu lakšeg snalaženja kod provjere popisa sortiranog prema uspješnosti
+//funkcija koja u tekstutalnu datoteku zapisuje ime i prezime ispitanika
+void popisivanje(position person, const char* fileName) {
+    FILE* file = fopen(fileName, "a");
+    if (!file) {
+        printf("Greska pri otvaranju datoteke!\n");
+        return;
+    }
+    fprintf(file, "Ime: %s\n", person->ime);
+    fprintf(file, "Prezime: %s\n", person->prezime);
+    fclose(file);
+}
+
+//funckija koja u tekstualnu datoteku zapisuje koliki je uspjeh u bodovima ostvario ispitanik
+void popis_ispitanika(int ukupno_bodova) {
+    FILE* file = fopen("popis_ispitanika.txt", "a");
+    if (!file) {
+        printf("Greska pri otvaranju datoteke!\n");
+        return;
+    }
+    fprintf(file, "\nUspjeh u bodovima: %d\n", ukupno_bodova);
+
+    fclose(file);
+}
+
+void kreiranje_profila() {
+    printf("\nUnos novog profila:\n");
+    position newPerson = InputProfile();
+
+    if (newPerson) {
+        SaveProfileToFile(newPerson, "profil_korisnika.txt");
+
+        // Dodavanje osobe u popis svih ispitanika
+        popisivanje(newPerson, "popis_ispitanika.txt");
+        free(newPerson);
+    }
+    else {
+        printf("Greška pri unosu profila.\n");
+    }
+}
+
+int main() {
+
+    char izbor[4]; 
+
+    rima_zadaci("rima.txt");
+    slogovni_zadaci("slogovi.txt");
+    fonemski_zadaci("fonemi.txt");
+
+    do {
+        kreiranje_profila(); 
+
+        printf("\nZadatak 1: Rima\n");
+        rima_test("rima.txt");
+        int bodovi_rima = unos_bodova(); 
+
+        printf("\nZadatak 2: Slogovna svjesnost\n");
+        slogovi_test("slogovi.txt");
+        int bodovi_slogovi = unos_bodova();  
+
+        printf("\nZadatak 3: Fonemska svjesnost\n");
+        fonemi_test("fonemi.txt");
+        int bodovi_fonemi = unos_bodova(); 
+
+        int ukupno_bodova = bodovi_rima + bodovi_slogovi + bodovi_fonemi;
+        printf("\nUkupni bodovi: %d\n", ukupno_bodova);
+        printf("\n-------------------------------------------\n");
+        printf("Ukupni bodovi za sve zadatke: %d\n", ukupno_bodova);
+        if (ukupno_bodova >= 20) {
+            printf("Svjesnost jezika je na izvrsnoj razini!\n");
+        }
+        else {
+            printf("Rezultat nije zadovoljavajući. Preporuka: nastaviti s vježbanjem.\n");
+        }
+
+        popis_ispitanika(ukupno_bodova);
+
+        printf("\nŽelite li ispitati još osoba? (da/ne): ");
+        fgets(izbor, sizeof(izbor), stdin);  
+        izbor[strcspn(izbor, "\n")] = '\0';  
+
+    } while (strcmp(izbor, "da") == 0); 
+    TreeNode* root = NULL;
+
+    readFileAndBuildTree("popis_ispitanika.txt", &root);
+
+    // Otvaranje datoteke za pisanje (prepisivanje postojećeg sadržaja sortirano)
+    FILE* file = fopen("popis_ispitanika.txt", "w");
+    if (file == NULL) {
+        printf("Greška pri otvaranju datoteke za pisanje.\n");
+        return -1;
+    }
+
+    // Ispis stabla (sortirani podaci) u datoteku
+    sortiranje(root, file);
+
+    fclose(file);
+
+    printf("Ispitanici su sortirani u datoteci prema uspjesnosti.\n");
+
+    return 0;
+}
+
+
+
+
