@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+// Definiranje popisa rimovanih riječi, fonema i slogova
+const char *rime[] = {"most - kost", "livada - trava", "snijeg - brijeg", "lopta - krov", "ptica - skica"};
+const char *fonemi[] = {"m-o-s-t", "p-t-i-c-a", "t-r-a-v-a", "l-o-p-t-a", "s-k-i-c-a", "k-u-l-a"};
+const char *slogovi[] = {"ka-me-nje", "o-bi-telj", "sa-nja-ti", "sli-ka-ti", "bro-do-vi", "te-le-fon"};
+
+// Funkcija koja generira nasumični cijeli broj u zadanom rasponu
+int random_int(int min, int max) {
+    return min + rand() % (max - min + 1);
+}
+
+// Funkcija koja generira nasumične logopedske zadatke
+void generiraj_logopedski_zadatak() {
+    // Generiranje nasumične rime
+    const char *rima = rime[random_int(0, 4)];
+    
+    // Generiranje nasumičnog fonema
+    const char *fonem = fonemi[random_int(0, 5)];
+    
+    // Generiranje nasumične riječi sastavljene od dva sloga
+    const char *slog1 = slogovi[random_int(0, 5)];
+    const char *slog2 = slogovi[random_int(0, 5)];
+    char rijec[10];
+    snprintf(rijec, sizeof(rijec), "%s%s", slog1, slog2);
+    
+    // Ispisivanje zadatka
+    printf("Nasumična rima: %s\n", rima);
+    printf("Nasumični fonem: %s\n", fonem);
+    printf("Nasumična riječ: %s\n", rijec);
+}
+
+int main() {
+    // Inicijalizacija generatora nasumičnih brojeva
+    srand(time(NULL));
+    
+    // Generiranje logopedskog zadatka
+    generiraj_logopedski_zadatak();
+    
+    return 0;
+}
