@@ -344,7 +344,157 @@ int main() {
     return 0;
 }
 
+/*
+//funkcije za zadatke - prepoznavanje i to za rimu
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
+#define MAX_WORD_LEN 50
+#define NUM_TASKS 7
+
+// Funkcija za ispis zadatka za prepoznavanje rime u datoteku
+void ispisiZadatakRime(const char* filename) {
+    FILE* file = fopen(filename, "w");
+    if (file == NULL) {
+        perror("Greska pri otvaranju datoteke");
+        exit(1);
+    }
+
+    fprintf(file, "soba-roba\n");
+    fprintf(file, "grana-brana\n");
+    fprintf(file, "suma-vina\n");
+    fprintf(file, "crkva-mrkva\n");
+    fprintf(file, "padobran-knjizara\n");
+    fprintf(file, "gljiva-sljiva\n");
+    fprintf(file, "vodopad-sudoper\n");
+
+    fclose(file);
+}
+
+// Funkcija za ispis zadatka za proizvodnju rime u datoteku
+void ispisiZadatakProizvodnje(const char* filename) {
+    FILE* file = fopen(filename, "w");
+    if (file == NULL) {
+        perror("Greska pri otvaranju datoteke");
+        exit(1);
+    }
+
+    fprintf(file, "most\n");
+    fprintf(file, "meta\n");
+    fprintf(file, "puska\n");
+    fprintf(file, "crv\n");
+    fprintf(file, "lonac\n");
+    fprintf(file, "trava\n");
+    fprintf(file, "guma\n");
+
+    fclose(file);
+}
+
+// Funkcija za prepoznavanje rime
+int prepoznavanjeRime(const char* filename) {
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        perror("Greska pri otvaranju datoteke");
+        exit(1);
+    }
+
+    char line[MAX_WORD_LEN];
+    int score = 0;
+
+    while (fgets(line, sizeof(line), file)) {
+        char word1[MAX_WORD_LEN], word2[MAX_WORD_LEN];
+        sscanf(line, "%[^-]-%s", word1, word2);
+
+        printf("Da li se rijeci '%s' i '%s' rimuju? (DA/NE): ", word1, word2);
+        char odgovor[3];
+        scanf("%s", odgovor);
+
+        // Logika prepoznavanja rime (zadnji slog)
+        int len1 = strlen(word1), len2 = strlen(word2);
+        if (len1 > 1 && len2 > 1 && strcmp(&word1[len1 - 2], &word2[len2 - 2]) == 0) {
+            if (strcasecmp(odgovor, "DA") == 0) {
+                score++;
+            }
+        }
+        else {
+            if (strcasecmp(odgovor, "NE") == 0) {
+                score++;
+            }
+        }
+    }
+
+    fclose(file);
+    return score;
+}
+
+// Funkcija za proizvodnju rime
+int proizvodnjaRime(const char* filename) {
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        perror("Greska pri otvaranju datoteke");
+        exit(1);
+    }
+
+    char word[MAX_WORD_LEN];
+    int score = 0;
+
+    while (fgets(word, sizeof(word), file)) {
+        // Uklanjanje newline znaka
+        word[strcspn(word, "\n")] = 0;
+
+        printf("Unesite rijec koja se rimuje sa '%s': ", word);
+        char userWord[MAX_WORD_LEN];
+        scanf("%s", userWord);
+
+        // Provjera rime
+        int len1 = strlen(word), len2 = strlen(userWord);
+        if (len1 > 1 && len2 > 1 && strcmp(&word[len1 - 2], &userWord[len2 - 2]) == 0) {
+            score++;
+        }
+    }
+
+    fclose(file);
+    return score;
+}
+
+// Glavna funkcija
+int main() {
+    const char* fileRime = "zadatak_rime.txt";
+    const char* fileProizvodnja = "zadatak_proizvodnje.txt";
+
+    // Kreiranje datoteka sa zadacima
+    ispisiZadatakRime(fileRime);
+    ispisiZadatakProizvodnje(fileProizvodnja);
+
+    int ukupniBodovi = 0;
+
+    do {
+        printf("\nZadatak za prepoznavanje rime:\n");
+        int bodoviRime = prepoznavanjeRime(fileRime);
+
+        printf("\nZadatak za proizvodnju rime:\n");
+        int bodoviProizvodnje = proizvodnjaRime(fileProizvodnja);
+
+        ukupniBodovi = bodoviRime + bodoviProizvodnje;
+        printf("\nUkupno bodova: %d\n", ukupniBodovi);
+
+        if (ukupniBodovi < 6) {
+            printf("Lose postignuce. Pokusajte ponovo!\n\n");
+        }
+        else if (ukupniBodovi < 8) {
+            printf("Granicno postignuce. Pokusajte popraviti rezultat.\n\n");
+        }
+        else {
+            printf("Uredno postignuce. Bravo!\n");
+            break;
+        }
+    } while (1);
+
+    return 0;
+}
+
+*/
 
 
    
